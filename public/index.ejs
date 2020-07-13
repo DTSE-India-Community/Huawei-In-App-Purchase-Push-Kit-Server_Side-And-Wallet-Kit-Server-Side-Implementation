@@ -1,0 +1,204 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>HOME</title>
+    <style>
+        .container {
+            border-radius: 5px;
+            background-color: #f7f7f7;
+            padding: 5px;
+            width: 450px;
+            height: 550px;
+        }
+
+        .toggleContent {
+            display: none;
+        }
+
+        .strikeout {
+
+            line-height: 5em;
+            position: relative;
+            font-size: 7px;
+        }
+
+        .strikeout::after {
+            border-bottom: 0.500em solid red;
+            content: "";
+            left: 0;
+            margin-top: calc(0.500em / 2 * -1);
+            position: absolute;
+            right: 0;
+            top: 50%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <script type="text/javascript">
+
+        // var subsriptionCancel = require('./hmsapis/getSubcriptionProductCanceled');
+
+        function toggleButton(evt, buttonName) {
+            var i, tabcontent, buttonToggle;
+            tabcontent = document.getElementsByClassName("toggleContent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            buttonToggle = document.getElementsByClassName("buttonToggle");
+            for (i = 0; i < buttonToggle.length; i++) {
+                buttonToggle[i].className = buttonToggle[i].className.replace(" active", "");
+            }
+            document.getElementById(buttonName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+        document.addEventListener("DOMContentLoaded", function (event) {
+            document.getElementById("defaultOpen").click();
+        });
+
+        function subCanceled() {
+            fetch('/subscriptionCancell', { method: 'POST' })
+                .then(response => response.text())
+                .then(text => console.log(text));
+        }
+
+
+    </script>
+
+    <div>
+        <button class="buttonToggle" onclick="toggleButton(event, 'push')"
+            style="width: 300px; height: 50px; background-color: #f44336; border: none; font-size: 20px; color: white;">
+            PUSH NOTIFICATION
+        </button>
+
+        <button class="buttonToggle" onclick="toggleButton(event, 'In-App')" id="defaultOpen"
+            style="width: 300px; height: 50px; background-color: #84e059; border: none; font-size: 20px; color: black;">
+            IN-APP PURCHASE
+        </button>
+    </div>
+    <div id="push" class="toggleContent">
+        <center>
+            <br></br>
+            <div class="container">
+                <img class="logo" src="http://localhost:3030/img/notifyimg.png" alt="My_Logo">
+
+                <form method="POST" action="/SendNotification">
+                    <h2>Send Huawei Push Notification</h2>
+                    <input type="text" name="titleMsg" placeholder="Enter title ..."
+                        style="width: 300px; height: 30px;"><br></br>
+                    <textarea id="subject" name="pushMessage" placeholder="Write something.."
+                        style="width: 300px; height: 100px;"></textarea><br></br>
+                    <!-- <input type="text" name="pushMessage" style="width: 300px; height: 100px;" placeholder="Enter Your Message..." ><br></br> -->
+                    <input type="submit"
+                        style="width: 300px; height: 50px; background-color: #f44336; border: none; font-size: 20px; color: white;" />
+                </form>
+            </div>
+
+            <h3 style="color: green;"><%= notifySucesssMessage %></h3>
+        </center>
+    </div>
+
+    <div id="In-App" class="toggleContent">
+        <br>
+        <center><span style="font-size: 25px; color: #f44336;"><%= message %></span></center></br>
+        <br></br>
+        <form method="POST">
+            <table style="border-collapse: collapse;">
+                <tr style="border: solid thin; background-color: cadetblue; color: antiquewhite;">
+                    <th style="border: solid thin;">USER ID</th>
+                    <th style="border: solid thin;">Purchase Token</th>
+                    <th style="border: solid thin;">Subscription ID</th>
+                    <th style="border: solid thin;">Subscription Valid</th>
+                    <th style="border: solid thin;">Product ID</th>
+                    <th style="border: solid thin;">Product Name</th>
+                    <th style="border: solid thin;">Purchase State</th>
+                    <th style="border: solid thin;">Currency</th>
+                    <th style="border: solid thin;">Price</th>
+                    <th style="border: solid thin;">Purchase Time</th>
+                    <th style="border: solid thin;">Country</th>
+                    <th style="border: solid thin;">Expiration Date</th>
+                    <th style="border: solid thin;">Action</th>
+                </tr>
+                <% if(typeof productList != "undefined"){ %>
+
+
+                <% productList.forEach(details => { %>
+                <tr style="border: solid thin;" name="purchaseToken">
+                    <td style="border: solid thin;"><%= details.userId %></td>
+                    <td style="border: solid thin; width: 15%;">
+                        <center><span class="strikeout"><%= details.purchaseToken %></span></center>
+                    </td>
+                    <td style="border: solid thin;">
+                        <center><span class="strikeout"><%= details.subscriptionId %></span></center>
+                    </td>
+                    <td style="border: solid thin;">
+                        <center><%= details.subIsvalid %></center>
+                    </td>
+                    <td style="border: solid thin;">
+                        <center><%= details.productId %></center>
+                    </td>
+                    <td style="border: solid thin;">
+                        <center><%= details.productName %></center>
+                    </td>
+                    <% if(details.purchaseState == 0){ %>
+                    <td style="border: solid thin;">
+                        <center>Purchased</center>
+                    </td>
+                    <% }else if(details.purchaseState == 1){ %>
+                    <td style="border: solid thin;">
+                        <center>Canceled</center>
+                    </td>
+                    <% }else if(details.purchaseState == 2){ %>
+                    <td style="border: solid thin;">
+                        <center>Refunded</center>
+                    </td>
+                    <% } %>
+                    <td style="border: solid thin;">
+                        <center><%= details.currency %></center>
+                    </td>
+                    <td style="border: solid thin;">
+                        <center><%= details.price %></center>
+                    </td>
+                    <td id="xy" style="border: solid thin;">
+                        <center>
+                            <%= convertDateTime(details.purchaseTime) %>
+                        </center>
+                    </td>
+                    <td style="border: solid thin;">
+                        <center><%= details.country %></center>
+                    </td>
+                    <td id="yy" style="border: solid thin;">
+                        <center>
+                            <%= convertDateTime(details.expirationDate) %>
+                        </center>
+                    </td>
+                    <td style="white-space: nowrap; width: 50%;">
+
+                        <center>
+                            <button
+                                style="margin: 2px; background-color: #f44336; border: none; box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19); color:#fff;height: 30px;"
+                                type="submit"
+                                formaction="/subscriptionCancell/<%= details.purchaseToken %>/<%= details.subscriptionId %>">Cancel</button>
+                            <button
+                                style="margin: 2px; background-color: #e67e22; border: none; box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);color:#fff;height: 30px;"
+                                type="submit"
+                                formaction="/subscriptionRefund/<%= details.purchaseToken %>/<%= details.subscriptionId %>">Refund</button>
+                            <button
+                                style="margin: 2px; background-color: #2ecc71; border: none; box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);color:#fff ;height: 30px;"
+                                type="submit"
+                                formaction="/subscriptionRevoke/<%= details.purchaseToken %>/<%= details.subscriptionId %>">Revoke</button>
+                        </center>
+                    </td>
+                </tr>
+
+                <% }) %>
+
+                <% } %>
+            </table>
+        </form>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,22 @@
+{
+  "name": "android-node-server",
+  "version": "1.0.0",
+  "description": "It is a server for HMS Push Notification Kit",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js"
+  },
+  "author": "Sanghati",
+  "license": "ISC",
+  "dependencies": {
+    "core-util-is": "^1.0.2",
+    "ejs": "^3.1.2",
+    "express": "^4.17.1",
+    "moment": "^2.26.0",
+    "mongodb": "^3.5.7",
+    "mongoose": "^5.9.11",
+    "nodemon": "^2.0.4",
+    "request": "^2.88.2"
+  }
+}
