@@ -3,7 +3,7 @@ var request = require("request");
 const sendNotify = (appLevelToken, tokenVal, titleMsg, pushMessage, callBack) => {
     var options = {
         method: 'POST',
-        url: 'https://push-api.cloud.huawei.com/v1/101919009/messages:send',
+        url: 'https://push-api.cloud.huawei.com/v1/{PUT_YOUR_APPID}/messages:send',
         headers:
         {
             authorization: 'Bearer ' + appLevelToken,
