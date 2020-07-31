@@ -12,6 +12,9 @@ var subsriptionDetails = require('./hmsapis/getSubcriptionProductDetails');
 var subscriptionCancel = require('./hmsapis/getSubcriptionProductCanceled');
 var subscriptionRefund = require('./hmsapis/getSubcriptionProductRefund');
 var subscriptionRevoke = require('./hmsapis/getSubcriptionProductRevoke');
+var createTicketModel = require('./hmsapis/createEventTicketModel');
+var createTicketInstance = require('./hmsapis/createEventTicketInstance');
+var appTokenWallet = require('./hmsapis/appLevelAccessTokenWallet');
 
 //Variables...
 var arrToken = [];
@@ -345,6 +348,29 @@ MongoClient.connect(mongoDbUrl, { useUnifiedTopology: true }, (err, db) => {
         });
     });
 
+    app.post('/createTicket', (req, res, next) => {
+        appTokenWallet.getAppToken((callBack) => {
+           
+            let authorization = callBack
+            console.log(authorization);
+            let serialNumber = Math.floor(Math.random() * 50000) + 100000;
+            console.log(serialNumber);
+            let ticketBookingDate = convertDateToUTC();
+            createTicketModel.getEventTIcketModelObject(authorization,ticketBookingDate, callBackMessage => {
+                console.log(callBackMessage);   
+            });
+            createTicketInstance.getEventTIcketInstanceObject(authorization,serialNumber,ticketBookingDate,req.body.seat,req.body.username,"Dil Bechara",callBackMsg => {
+                if(callBackMsg!=null){
+                    res.send(""+serialNumber);
+                }
+                
+            });
+                
+
+        });
+
+    });
+
     // DELETE ALL SUBCRIPTION PRODUCT...
     app.get('/deleteAllSubscription', (req, res, next) => {
         dbase.collection('subscriptionProduct').deleteMany({}, function (err, results) {
@@ -363,4 +389,13 @@ MongoClient.connect(mongoDbUrl, { useUnifiedTopology: true }, (err, db) => {
             + dateTime.getHours() + ":" + dateTime.getMinutes() + ":" + dateTime.getSeconds();
     }
 
+
+    // WALLET API STARTS HERE...
+
+    
+
+    function convertDateToUTC() { 
+        var date = new Date(); 
+    return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds()); 
+    }
 });
